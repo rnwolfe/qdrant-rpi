@@ -1,0 +1,33 @@
+name: Bump Qdrant Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      qdrant_version:
+        description: "Qdrant tag (e.g. v1.16.2)"
+        required: true
+        type: string
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update versions/qdrant.version
+        run: |
+          ./scripts/set-qdrant-version.sh "${{ inputs.qdrant_version }}"
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "bump: Qdrant ${{ inputs.qdrant_version }}"
+          title: "bump: Qdrant ${{ inputs.qdrant_version }}"
+          body: |
+            Updates Qdrant build target to ${{ inputs.qdrant_version }}.
+          branch: "bump/qdrant-${{ inputs.qdrant_version }}"
+
